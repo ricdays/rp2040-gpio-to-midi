@@ -1,3 +1,3 @@
 @echo off
 
-copy .\build\src-hello-world\xiodevice.uf2 D:
+copy .\build\src\mydevice.uf2 D:

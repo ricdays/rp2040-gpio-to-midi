@@ -16,29 +16,12 @@ set(CMAKE_CXX_STANDARD 17)
 # Initialize the SDK
 pico_sdk_init()
 
-# Set ethernet chip
-set(WIZNET_CHIP W5500)
-if(${WIZNET_CHIP} STREQUAL W5100S)
-    add_definitions(-D_WIZCHIP_=W5100S)
-elseif(${WIZNET_CHIP} STREQUAL W5500)
-    add_definitions(-D_WIZCHIP_=W5500)
-else()
-    message(FATAL_ERROR "WIZNET_CHIP is wrong = ${WIZNET_CHIP}")
-endif()
-
-message(STATUS "WIZNET_CHIP = ${WIZNET_CHIP}")
-
 # Set the project root directory if it's not already defined, as may happen if
 # the tests folder is included directly by a parent project, without including
 # the top level CMakeLists.txt.
 if(NOT DEFINED FREERTOS_DIR)
     set(FREERTOS_DIR ${CMAKE_SOURCE_DIR}/libraries/FreeRTOS-Kernel)
     message(STATUS "FREERTOS_DIR = ${FREERTOS_DIR}")
-endif()
-
-if(NOT DEFINED WIZNET_DIR)
-    set(WIZNET_DIR ${CMAKE_SOURCE_DIR}/libraries/ioLibrary_Driver)
-    message(STATUS "WIZNET_DIR = ${WIZNET_DIR}")
 endif()
 
 if(NOT DEFINED MBEDTLS_DIR)
