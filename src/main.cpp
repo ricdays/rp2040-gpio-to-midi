@@ -152,10 +152,8 @@ void midi_task(void)
   {
     if (currentPreset == ActivePreset::Master)
       tud_midi_stream_write(cable_num, pc_presetA, 2);
-      /*
     else if (currentPreset == ActivePreset::Auxiliary)
       tud_midi_stream_write(cable_num, pc_presetB, 2);
-      */
   }
 }
 
