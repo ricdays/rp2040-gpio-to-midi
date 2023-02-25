@@ -1,0 +1,20 @@
+{
+    "cmake.configureEnvironment": {
+        "PICO_SDK_PATH": "../libraries/pico-sdk"
+    },
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "NMake Makefiles",
+    "files.associations": {
+        "*.ejs": "html",
+        "variant": "cpp"
+    },
+    "git.ignoreLimitWarning": true,
+    "git.ignoredRepositories": [
+        "./libraries/FreeRTOS-Kernel",
+        "./libraries/ioLibrary_Driver",
+        "./libraries/mbedtls",
+        "./libraries/pico-extras",
+        "./libraries/pico-sdk"
+    ],
+    "git.autoRepositoryDetection": "openEditors"
+}
