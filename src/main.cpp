@@ -8,6 +8,7 @@
 
 
 #define INPUT_PIN 16
+#define ALWAYS_SEND 0
 
 enum UsbState {
   USB_NOT_MOUNTED = 0,
@@ -28,16 +29,21 @@ ActivePreset currentPreset = ActivePreset::Unknown;
 // Preset messages
 uint8_t pc_presetA[2] = { 0xC0, 0x00 };
 uint8_t pc_presetB[2] = { 0xC0, 0x01 };
-const uint32_t kPresetSendInterval_ms = 1000;
+const uint32_t kPresetSendInterval_ms = 200;
 
 // Debounce input
 const int kDebounceWindow = 10;
 int inputDebounceValue = kDebounceWindow / 2;
-const uint32_t kDebouncePeriod_ms = 50;
+const uint32_t kDebouncePeriod_ms = 20;
 
 // Blink frequency
 const uint32_t kBlink_mountedA = 1000;
 const uint32_t kBlink_mountedB = 250;
+
+#if ALWAYS_SEND
+#else
+bool changedPreset = false;
+#endif
 
 // ---
 
@@ -75,6 +81,7 @@ int main(void)
 void tud_mount_cb(void)
 {
   currentUsbState = UsbState::USB_MOUNTED;
+  changedPreset = true;
 }
 
 // Invoked when device is unmounted
@@ -96,6 +103,7 @@ void tud_suspend_cb(bool remote_wakeup_en)
 void tud_resume_cb(void)
 {
   currentUsbState = UsbState::USB_MOUNTED;
+  changedPreset = true;
 }
 
 void gpio_task(void)
@@ -118,12 +126,16 @@ void gpio_task(void)
   if (val && inputDebounceValue < kDebounceWindow)
   {
     inputDebounceValue++;
-    if (inputDebounceValue == kDebounceWindow)
+    if (inputDebounceValue == kDebounceWindow) {
+      changedPreset = true;
       currentPreset = ActivePreset::Master;
+    }
   } else if (!val && inputDebounceValue > 0) {
     inputDebounceValue--;
-    if (inputDebounceValue == 0)
+    if (inputDebounceValue == 0) {
+      changedPreset = true;
       currentPreset = ActivePreset::Auxiliary;
+    }
   }
 
 }
@@ -150,10 +162,24 @@ void midi_task(void)
 
   if (currentUsbState == UsbState::USB_MOUNTED)
   {
-    if (currentPreset == ActivePreset::Master)
-      tud_midi_stream_write(cable_num, pc_presetA, 2);
-    else if (currentPreset == ActivePreset::Auxiliary)
-      tud_midi_stream_write(cable_num, pc_presetB, 2);
+    bool doSend = false;
+#if ALWAYS_SEND
+    doSend = true;
+#else
+    if (changedPreset)
+    {
+      doSend = true;
+      changedPreset = false;
+    }
+#endif
+
+    if (doSend)
+    {
+      if (currentPreset == ActivePreset::Master)
+        tud_midi_stream_write(cable_num, pc_presetA, 2);
+      else if (currentPreset == ActivePreset::Auxiliary)
+        tud_midi_stream_write(cable_num, pc_presetB, 2);
+    }
   }
 }
 
