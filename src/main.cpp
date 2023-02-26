@@ -40,10 +40,7 @@ const uint32_t kDebouncePeriod_ms = 20;
 const uint32_t kBlink_mountedA = 1000;
 const uint32_t kBlink_mountedB = 250;
 
-#if ALWAYS_SEND
-#else
 bool changedPreset = false;
-#endif
 
 // ---
 
